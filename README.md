@@ -1,0 +1,2 @@
+# img-rating-script
+ 
