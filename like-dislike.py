@@ -67,6 +67,10 @@ class ImageBrowser:
         self.directory_entry.delete(0, tk.END)
         self.directory_entry.insert(0, self.directory)
         self.images = find_images(self.directory)
+        
+        # Filter out images that have already been rated
+        self.images = [img for img in self.images if img not in self.ratings]
+        
         self.current_image = 0 if self.images else None
         self.next_image()  # Display the first image
 
@@ -74,7 +78,8 @@ class ImageBrowser:
         try:
             with open(ratings_file, 'r') as file:
                 self.ratings = json.load(file)
-        except FileNotFoundError:
+        except Exception:
+            print(f"Loading ratings failed! {Exception}")
             pass  # It's okay if the file doesn't exist
 
     def save_ratings(self, ratings_file):
@@ -102,16 +107,21 @@ class ImageBrowser:
         return self.photo_image
 
     def next_image(self):
-        if self.current_image is None or self.current_image >= len(self.images):
+        while self.current_image is not None and self.current_image < len(self.images):
+            # Load and display the next image
+            path = self.images[self.current_image]
+            # Check if the image is already rated
+            if path in self.ratings:
+                self.current_image += 1
+                continue
+            photo_image = self.resize_image(path)
+            self.image_label.config(image=photo_image)
+            self.current_image += 1
+            break
+        else:
             self.current_image = None  # No more images
             self.image_label.config(image=None)  # Clear the image
-            return
 
-        # Load and display the next image
-        path = self.images[self.current_image]
-        photo_image = self.resize_image(path)
-        self.image_label.config(image=photo_image)
-        self.current_image += 1
 
     def rate_image(self, rating):
         if self.current_image is not None:
