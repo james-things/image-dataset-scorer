@@ -14,6 +14,7 @@ def find_images(directory):
                 images.append(os.path.join(root, file))
     return images
 
+
 class ImageBrowser:
     def __init__(self):
         self.root = tk.Tk()
@@ -41,7 +42,7 @@ class ImageBrowser:
         self.directory_entry = tk.Entry(self.buttons_frame)
         self.directory_entry.pack(side='top', padx=5, pady=5, fill='x')
 
-        self.root.geometry('1600x900') # This corresponds to a 16:9 ratio
+        self.root.geometry('1600x900') 
 
         # Attributes
         self.images = []  # list of all image paths
@@ -59,18 +60,34 @@ class ImageBrowser:
         self.directory = filedialog.askdirectory()
         if not self.directory:
             return
-        self.ratings_file_path = f'{self.directory}/rlhf-ratings.json'
 
-        print(self.ratings_file_path)
+        load_or_create = tk.messagebox.askyesno("Ratings File", 
+                                                "Would you like to load an existing ratings file?\n"
+                                                "Select 'No' to create a new ratings file.")
+        if load_or_create:
+            # User wants to load an existing file
+            self.ratings_file_path = filedialog.askopenfilename(defaultextension=".json",
+                                                                filetypes=[("JSON files", "*.json")],
+                                                                title="Select existing ratings file")
+        else:
+            # User wants to create a new file
+            self.ratings_file_path = filedialog.asksaveasfilename(defaultextension=".json",
+                                                                  filetypes=[("JSON files", "*.json")],
+                                                                  title="Create new ratings file")
+
+        if not self.ratings_file_path:
+            return
+
+        print(f'Ratings File: {self.ratings_file_path}')
         self.load_ratings(self.ratings_file_path)
 
         self.directory_entry.delete(0, tk.END)
         self.directory_entry.insert(0, self.directory)
         self.images = find_images(self.directory)
-        
+
         # Filter out images that have already been rated
         self.images = [img for img in self.images if img not in self.ratings]
-        
+
         self.current_image = 0 if self.images else None
         self.next_image()  # Display the first image
 
@@ -84,7 +101,7 @@ class ImageBrowser:
 
     def save_ratings(self, ratings_file):
         with open(ratings_file, 'w') as file:
-            json.dump(self.ratings, file)
+            json.dump(self.ratings, file, indent=4)
 
     def resize_image(self, img_path):
         # Fetch the size of the image panel
@@ -122,7 +139,6 @@ class ImageBrowser:
             self.current_image = None  # No more images
             self.image_label.config(image=None)  # Clear the image
 
-
     def rate_image(self, rating):
         if self.current_image is not None:
             path = self.images[self.current_image - 1]  # The last displayed image
@@ -143,7 +159,13 @@ class ImageBrowser:
             return
         for path, rating in self.ratings.items():
             if rating == 'like':
+                # Copy the image
                 shutil.copy(path, copy_to_dir)
+
+                # Check if a .txt file exists with the same name, and copy it
+                txt_path = os.path.splitext(path)[0] + ".txt"
+                if os.path.exists(txt_path):
+                    shutil.copy(txt_path, copy_to_dir)
 
 
 if __name__ == "__main__":
