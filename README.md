@@ -13,3 +13,6 @@ The script currently implements the following features and can be easily extende
  - Images re-rated after traversing backwards in a session have their ratings data updated appropriately
  - To produce a dataset of only "Liked" images, a `Copy Liked to Target Dir` functionality is included
  - When copying liked images, automatically copy metadata (.txt) files with matching names
+
+![demo-img-1](https://github.com/james-things/local-rlhf-viewer/assets/71165873/51314569-1be1-4f9b-b6c4-7f2d8a4790cb)
+![demo-img-2](https://github.com/james-things/local-rlhf-viewer/assets/71165873/b9e0f3a3-6403-4f8d-92f9-5875cfe8a487)
