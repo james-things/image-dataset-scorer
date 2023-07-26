@@ -5,13 +5,15 @@ import json
 import shutil
 from PIL import Image, ImageTk
 
-# utility function to get image files
-def find_images(directory):
+# utility function to get image files, filtering already rated images
+def find_images(directory, ratings):
     images = []
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                images.append(os.path.join(root, file))
+                image_path = os.path.join(root, file)
+                if image_path not in ratings:
+                    images.append(image_path)
     return images
 
 
@@ -36,6 +38,7 @@ class ImageBrowser:
         self.create_button(self.buttons_frame, "Like", self.like, "#90EE90")
         self.create_button(self.buttons_frame, "Dislike", self.dislike, "#FF7F7F")
         self.create_button(self.buttons_frame, "Skip", self.next_image, "#FFDEAD")
+        self.create_button(self.buttons_frame, "Back", self.prev_image, "#DEADFF")
         self.create_button(self.buttons_frame, "Copy Liked", self.copy_liked, "#87CEFA")
         self.create_button(self.buttons_frame, "Load", self.load_directory, "#D3D3D3")
 
@@ -50,6 +53,8 @@ class ImageBrowser:
         self.ratings = {}  # dictionary mapping image paths to ratings
         self.directory = ""
         self.ratings_file_path = ""
+        self.prev_image_index = None 
+        self.last_rated_image = None 
         self.load_directory()
 
     def create_button(self, frame, text, command, color):
@@ -87,12 +92,9 @@ class ImageBrowser:
 
         self.directory_entry.delete(0, tk.END)
         self.directory_entry.insert(0, self.directory)
-        self.images = find_images(self.directory)
+        self.images = find_images(self.directory, self.ratings)
 
-        # Filter out images that have already been rated
-        self.images = [img for img in self.images if img not in self.ratings]
-
-        self.current_image = 0 if self.images else None
+        self.current_image = -1 if self.images else None
         self.next_image()  # Display the first image
 
     def load_ratings(self, ratings_file):
@@ -127,25 +129,40 @@ class ImageBrowser:
 
         return self.photo_image
 
+    def clear_image(self):
+        # Create a blank image and display it in the label
+        blank_image = ImageTk.PhotoImage(Image.new('RGB', (1, 1)))
+        self.image_label.config(image=blank_image)
+        self.image_label.image = blank_image  # Keep a reference to avoid garbage collection
+
+
     def next_image(self):
-        while self.current_image is not None and self.current_image < len(self.images):
+        if self.current_image is not None:
+            self.prev_image_index = self.current_image
+            self.current_image += 1
+
+        if self.current_image is not None and self.current_image < len(self.images):
             # Load and display the next image
             path = self.images[self.current_image]
-            # Check if the image is already rated
-            if path in self.ratings:
-                self.current_image += 1
-                continue
             photo_image = self.resize_image(path)
             self.image_label.config(image=photo_image)
-            self.current_image += 1
-            break
         else:
             self.current_image = None  # No more images
-            self.image_label.config(image=None)  # Clear the image
+            self.clear_image()  # Clear the image
+
+    def prev_image(self):
+        # Move to the previous image
+        if self.prev_image_index is not None and self.prev_image_index >= 0:
+            self.current_image = self.prev_image_index
+            self.prev_image_index -= 1
+
+            path = self.images[self.current_image]
+            photo_image = self.resize_image(path)
+            self.image_label.config(image=photo_image)
 
     def rate_image(self, rating):
         if self.current_image is not None:
-            path = self.images[self.current_image - 1]  # The last displayed image
+            path = self.images[self.current_image]
             self.ratings[path] = rating
             self.save_ratings(self.ratings_file_path)  # Save after each rating in case the program crashes
 
