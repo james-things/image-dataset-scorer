@@ -74,6 +74,10 @@ class ImageBrowser:
             self.ratings_file_path = filedialog.asksaveasfilename(defaultextension=".json",
                                                                   filetypes=[("JSON files", "*.json")],
                                                                   title="Create new ratings file")
+            if self.ratings_file_path:
+                # If the file already exists, delete it to enforce the overwrite.
+                if os.path.isfile(self.ratings_file_path):
+                    os.remove(self.ratings_file_path)
 
         if not self.ratings_file_path:
             return
