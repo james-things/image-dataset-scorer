@@ -41,14 +41,19 @@ class ImageBrowser:
         self.create_button(self.buttons_frame, "Copy Liked", self.copy_liked, "#87CEFA")
         self.create_button(self.buttons_frame, "Load", self.load_directory, "#D3D3D3")
 
-        self.directory_entry = tk.Entry(self.buttons_frame)
-        self.directory_entry.pack(side='top', padx=5, pady=5, fill='x')
+        # Directory display
+        self.directory_display = tk.Entry(self.buttons_frame)
+        self.directory_display.pack(side='top', padx=5, pady=5, fill='x')
+
+        # Metadata Text Area
+        self.metadata_text = tk.Text(self.buttons_frame, height=20, width=5)
+        self.metadata_text.pack(side='top', padx=5, pady=5, fill='x')
 
         self.root.geometry('1600x900') # currently hardcoded for a 2k display
 
         # Attributes
         self.images = []  # list of all image paths
-        self.current_image = None  # index of the current image
+        self.current_image_index = None  # index of the current image
         self.ratings = {}  # dictionary mapping image paths to ratings
         self.directory = ""
         self.ratings_file_path = ""
@@ -90,11 +95,11 @@ class ImageBrowser:
         print(f'Ratings File: {self.ratings_file_path}')
         self.load_ratings(self.ratings_file_path)
 
-        self.directory_entry.delete(0, tk.END)
-        self.directory_entry.insert(0, self.directory)
+        self.directory_display.delete(0, tk.END)
+        self.directory_display.insert(0, self.directory)
         self.images = find_images(self.directory, self.ratings)
 
-        self.current_image = -1 if self.images else None
+        self.current_image_index = -1 if self.images else None
         self.next_image()  # Display the first image
 
     # Load a target ratings JSON
@@ -138,36 +143,63 @@ class ImageBrowser:
         self.image_label.config(image=blank_image)
         self.image_label.image = blank_image  # Keep a reference to avoid garbage collection
 
-    # Advance to the next queued image
+     # Advance to the next queued image
     def next_image(self):
-        if self.current_image is not None:
-            self.prev_image_index = self.current_image
-            self.current_image += 1
+        # Metadata reset
+        self.metadata_text.delete('1.0', tk.END)
 
-        if self.current_image is not None and self.current_image < len(self.images):
+        if self.current_image_index is not None:
+            self.prev_image_index = self.current_image_index
+            self.current_image_index += 1
+
+        if self.current_image_index is not None and self.current_image_index < len(self.images):
             # Load and display the next image
-            path = self.images[self.current_image]
+            path = self.images[self.current_image_index]
             photo_image = self.resize_image(path)
             self.image_label.config(image=photo_image)
+
+            # Check if a .txt file exists with the same name, if so, load the metadata
+            txt_path = os.path.splitext(path)[0] + ".txt"
+            if os.path.exists(txt_path):
+                with open(txt_path, 'r', encoding='utf-8') as file:
+                    metadata = file.read()
+                    self.metadata_text.insert(tk.END, metadata)
+            else:
+                self.metadata_text.insert(tk.END, "NO METADATA")
         else:
-            self.current_image = None  # No more images
+            self.current_image_index = None  # No more images
             self.clear_image()  # Clear the image
+            self.metadata_text.insert(tk.END, "END OF DATASET REACHED")  # No more images, so no metadata
 
     # Step backwards to the previously viewed image
     def prev_image(self):
         # Move to the previous image
         if self.prev_image_index is not None and self.prev_image_index >= 0:
-            self.current_image = self.prev_image_index
+            self.current_image_index = self.prev_image_index
             self.prev_image_index -= 1
 
-            path = self.images[self.current_image]
+            path = self.images[self.current_image_index]
             photo_image = self.resize_image(path)
             self.image_label.config(image=photo_image)
 
+            # Check if a .txt file exists with the same name, if so, load the metadata
+            txt_path = os.path.splitext(path)[0] + ".txt"
+            if os.path.exists(txt_path):
+                with open(txt_path, 'r', encoding='utf-8') as file:
+                    metadata = file.read()
+                    self.metadata_text.insert(tk.END, metadata)
+            else:
+                self.metadata_text.insert(tk.END, "NO METADATA")
+        else:
+            self.current_image_index = -1  # No more images
+            self.prev_image_index = None
+            self.clear_image()  # Clear the image
+            self.metadata_text.insert(tk.END, "BEGINNING OF DATASET REACHED")  # No more images, so no metadata
+
     # Rate the currently viewed image
     def rate_image(self, rating):
-        if self.current_image is not None:
-            path = self.images[self.current_image]
+        if self.current_image_index is not None:
+            path = self.images[self.current_image_index]
             self.ratings[path] = rating
             self.save_ratings(self.ratings_file_path)  # Save after each rating in case the program terminates unexpectedly
 

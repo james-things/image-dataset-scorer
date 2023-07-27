@@ -1,2 +1,2 @@
 @echo off
-python like-dislike.py
+python local-rlhf-viewer.py
