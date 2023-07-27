@@ -173,6 +173,9 @@ class ImageBrowser:
 
     # Step backwards to the previously viewed image
     def prev_image(self):
+        # Metadata reset
+        self.metadata_text.delete('1.0', tk.END)
+        
         # Move to the previous image
         if self.prev_image_index is not None and self.prev_image_index >= 0:
             self.current_image_index = self.prev_image_index
