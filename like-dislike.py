@@ -22,6 +22,12 @@ class ImageBrowser:
         self.root = tk.Tk()
         self.root.title("RLHF")
         self.root.configure(bg='white')
+
+        # Bindings for the arrow keys
+        self.root.bind('<Left>', lambda event: self.prev_image())
+        self.root.bind('<Right>', lambda event: self.next_image())
+        self.root.bind('<Up>', lambda event: self.like())
+        self.root.bind('<Down>', lambda event: self.dislike())
         
         # Create frames for ImagePanel and ButtonsPanel
         self.image_frame = tk.Frame(self.root, bg='white', bd=2, relief='groove')
@@ -34,10 +40,10 @@ class ImageBrowser:
         self.image_label.pack(fill='both', expand=False)
 
         # Buttons
-        self.create_button(self.buttons_frame, "Like", self.like, "#90EE90")
-        self.create_button(self.buttons_frame, "Dislike", self.dislike, "#FF7F7F")
-        self.create_button(self.buttons_frame, "Skip", self.next_image, "#FFDEAD")
-        self.create_button(self.buttons_frame, "Back", self.prev_image, "#DEADFF")
+        self.create_button(self.buttons_frame, "Like (↑)", self.like, "#90EE90")
+        self.create_button(self.buttons_frame, "Dislike (↓)", self.dislike, "#FF7F7F")
+        self.create_button(self.buttons_frame, "Skip (→)", self.next_image, "#FFDEAD")
+        self.create_button(self.buttons_frame, "Back (←)", self.prev_image, "#DEADFF")
         self.create_button(self.buttons_frame, "Copy Liked", self.copy_liked, "#87CEFA")
         self.create_button(self.buttons_frame, "Load", self.load_directory, "#D3D3D3")
 
