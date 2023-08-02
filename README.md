@@ -17,9 +17,6 @@ The script currently implements the following features and can be easily extende
 
 ## Demo
 
-Convenient keybinds:
-![new-keybinds](https://github.com/james-things/local-rlhf-viewer/assets/71165873/a67d3761-40d5-4cc5-89a4-55804faa3085)
-
 Creating ratings file:
 ![demo-img-1](https://github.com/james-things/local-rlhf-viewer/assets/71165873/51314569-1be1-4f9b-b6c4-7f2d8a4790cb)
 
@@ -28,3 +25,6 @@ Rating images:
 
 Save rating data:
 ![rating-data](https://github.com/james-things/local-rlhf-viewer/assets/71165873/fce74746-7495-48dd-9ba8-7009a43351f6)
+
+Convenient keybinds: 
+![new-keybinds](https://github.com/james-things/local-rlhf-viewer/assets/71165873/a67d3761-40d5-4cc5-89a4-55804faa3085)
