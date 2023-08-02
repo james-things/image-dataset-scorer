@@ -11,10 +11,11 @@ def find_images(directory, ratings):
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                image_path = os.path.join(root, file)
+                image_path = os.path.join(root, file).replace('\\', '/')
                 if image_path not in ratings:
                     images.append(image_path)
     return images
+
 
 # Primary application class
 class ImageBrowser:
@@ -73,7 +74,7 @@ class ImageBrowser:
 
     # Step user through process to load image data and define ratings file
     def load_directory(self):
-        self.directory = filedialog.askdirectory()
+        self.directory = filedialog.askdirectory().replace('\\', '/')
         if not self.directory:
             return
 
@@ -224,7 +225,7 @@ class ImageBrowser:
 
     # Copy all positively rated images and associated metadata to target directory
     def copy_liked(self):
-        copy_to_dir = filedialog.askdirectory()
+        copy_to_dir = filedialog.askdirectory().replace('\\', '/')
         if not copy_to_dir:
             return
         for path, rating in self.ratings.items():
