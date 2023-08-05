@@ -6,7 +6,8 @@ The script currently implements the following features and can be easily extende
 
  - Rate images as either `Liked` or `Disliked`
  - Easy to interpret, user-friendly interface
- - `Create` or `Load` a ratings file (JSON) to associate with a particular dataset or objective
+ - `Create` or `Select` a ratings file (JSON) to associate with a particular dataset or objective
+ - Load altenate datasets on the fly with `Load Dataset` 
  - Select a target folder and search it and its subfolders recursively for images
  - Filter out previously rated images and enqueue yet-to-be-rated images for evaluation
  - Run through queued images quickly using `Like`, `Dislike`, `Skip`, and `Back` buttons
