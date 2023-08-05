@@ -6,14 +6,20 @@ import shutil
 from PIL import Image, ImageTk
 
 # Utility function to get image files, filtering already rated images
-def find_images(directory, ratings):
+def find_images(directory, ratings, filter_square=False):
     images = []
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
                 image_path = os.path.join(root, file).replace('\\', '/')
                 if image_path not in ratings:
-                    images.append(image_path)
+                    if filter_square:
+                        # Open the image and check if it is square
+                        with Image.open(image_path) as img:
+                            if img.width == img.height:
+                                images.append(image_path)
+                    else:
+                        images.append(image_path)
     return images
 
 
@@ -30,15 +36,20 @@ class ImageBrowser:
         self.root.bind('<Up>', lambda event: self.like())
         self.root.bind('<Down>', lambda event: self.dislike())
         
-        # Create frames for ImagePanel and ButtonsPanel
+        # Frames for ImagePanel and ButtonsPanel
         self.image_frame = tk.Frame(self.root, bg='white', bd=2, relief='groove')
         self.image_frame.pack(fill='both', expand=True, side='left', padx=(10,5), pady=10)
         self.buttons_frame = tk.Frame(self.root, bg='white', bd=2, relief='groove')
         self.buttons_frame.pack(fill='both', expand=False, side='right', padx=(5,10), pady=10)
 
-        # Create label for images and place it in the image frame
+        # Label for images and place it in the image frame
         self.image_label = tk.Label(self.image_frame, bg='white')
         self.image_label.pack(fill='both', expand=False)
+
+        # Filter checkbox for square images
+        self.filter_square_var = tk.IntVar()
+        self.filter_square_cb = tk.Checkbutton(self.buttons_frame, text="filter: square images only", variable=self.filter_square_var, command=self.update_image_list, bg='white')
+        self.filter_square_cb.pack(side='bottom', padx=5, pady=5)
 
         # Buttons
         self.create_button(self.buttons_frame, "Like (↑)", self.like, "#90EE90")
@@ -104,7 +115,7 @@ class ImageBrowser:
 
         self.directory_display.delete(0, tk.END)
         self.directory_display.insert(0, self.directory)
-        self.images = find_images(self.directory, self.ratings)
+        self.images = find_images(self.directory, self.ratings, filter_square=bool(self.filter_square_var.get()))
 
         self.current_image_index = -1 if self.images else None
         self.next_image()  # Display the first image
@@ -121,6 +132,15 @@ class ImageBrowser:
     def save_ratings(self, ratings_file):
         with open(ratings_file, 'w') as file:
             json.dump(self.ratings, file, indent=4)
+
+    # Update the list of queued images, respecting filter state
+    def update_image_list(self):
+        filter_square = bool(self.filter_square_var.get())
+        self.images = find_images(self.directory, self.ratings, filter_square)
+        self.current_image_index = -1 if self.images else None
+        self.prev_image_index = None
+        self.next_image()  # Refresh the first image
+
 
     # Resize an image to fit within the display area
     def resize_image(self, img_path):
