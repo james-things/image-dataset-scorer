@@ -22,3 +22,9 @@ Creating ratings file:
 
 Rating images:
 ![demo-img-2](https://github.com/james-things/local-rlhf-viewer/assets/71165873/b9e0f3a3-6403-4f8d-92f9-5875cfe8a487)
+
+Save rating data:
+![rating-data](https://github.com/james-things/local-rlhf-viewer/assets/71165873/fce74746-7495-48dd-9ba8-7009a43351f6)
+
+Convenient keybinds: 
+![new-keybinds](https://github.com/james-things/local-rlhf-viewer/assets/71165873/a67d3761-40d5-4cc5-89a4-55804faa3085)
