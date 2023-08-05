@@ -57,7 +57,7 @@ class ImageBrowser:
         self.create_button(self.buttons_frame, "Skip (→)", self.next_image, "#FFDEAD")
         self.create_button(self.buttons_frame, "Back (←)", self.prev_image, "#DEADFF")
         self.create_button(self.buttons_frame, "Copy Liked", self.copy_liked, "#87CEFA")
-        self.create_button(self.buttons_frame, "Load", self.load_directory, "#D3D3D3")
+        self.create_button(self.buttons_frame, "Load Dataset", self.load_directory, "#D3D3D3")
 
         # Directory display
         self.directory_display = tk.Entry(self.buttons_frame)
