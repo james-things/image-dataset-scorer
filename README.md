@@ -6,7 +6,8 @@ The script currently implements the following features and can be easily extende
 
  - Rate images as either `Liked` or `Disliked`
  - Easy to interpret, user-friendly interface
- - `Create` or `Load` a ratings file (JSON) to associate with a particular dataset or objective
+ - `Create` or `Select` a ratings file (JSON) to associate with a particular dataset or objective
+ - Load altenate datasets on the fly with `Load Dataset` 
  - Select a target folder and search it and its subfolders recursively for images
  - Filter out previously rated images and enqueue yet-to-be-rated images for evaluation
  - Run through queued images quickly using `Like`, `Dislike`, `Skip`, and `Back` buttons
@@ -14,14 +15,16 @@ The script currently implements the following features and can be easily extende
  - Images re-rated after traversing backwards in a session have their ratings data updated appropriately
  - To produce a dataset of only "Liked" images, a `Copy Liked to Target Dir` functionality is included
  - When copying liked images, automatically copy metadata (.txt) files with matching names
+ - Automatically display associated metadata in text area if found
+ - Optionally specify `filter: square images only`
 
 ## Demo
 
 Creating ratings file:
-![demo-img-1](https://github.com/james-things/local-rlhf-viewer/assets/71165873/51314569-1be1-4f9b-b6c4-7f2d8a4790cb)
+![demo-img-1](https://github.com/james-things/local-rlhf-viewer/assets/71165873/f985fd5d-5a2e-426b-8125-203c190e2805)
 
 Rating images:
-![demo-img-2](https://github.com/james-things/local-rlhf-viewer/assets/71165873/b9e0f3a3-6403-4f8d-92f9-5875cfe8a487)
+![demo-img-2](https://github.com/james-things/local-rlhf-viewer/assets/71165873/c6d8750b-d959-4180-b9be-c04d75d1f8fd)
 
 Save rating data:
 ![rating-data](https://github.com/james-things/local-rlhf-viewer/assets/71165873/fce74746-7495-48dd-9ba8-7009a43351f6)
