@@ -1,6 +1,6 @@
 # Image Dataset Scorer
 
-A simple, graphical, local image dataset viewer which allows you to generate human feedback ("RLHF") metadata on that data, written in Python
+A simple, graphical, local image dataset viewer which allows you to generate human feedback ("RLHF") metadata, written in Python
 
 The script currently implements the following features and can be easily extended/altered to suit your needs:
 
