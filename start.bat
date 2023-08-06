@@ -1,2 +1,2 @@
 @echo off
-image-dataset-scorer.py
+python image-dataset-scorer.py
