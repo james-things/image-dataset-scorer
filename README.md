@@ -16,7 +16,6 @@ The script currently implements the following features and can be easily extende
  - Images re-rated after traversing backwards in a session have their ratings data updated appropriately
  - To produce a dataset of only "Liked" or "Disliked" images, a `Copy [Rating] to Target Dir` functionality is included
  - When copying rated images, automatically copy metadata (.txt) files with matching names
- - Automatically display associated metadata in text area if found
  - Filtering modes: `all`, `portrait`, `landscape`, `square`
 
 ## Demo
