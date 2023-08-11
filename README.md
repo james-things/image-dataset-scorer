@@ -13,18 +13,15 @@ The script currently implements the following features and can be easily extende
  - Run through queued images quickly using `Like`, `Dislike`, `Skip`, and `Back` buttons
  - Ratings are stored in real-time, allowing for completion of rating work in convenient chunks
  - Images re-rated after traversing backwards in a session have their ratings data updated appropriately
- - To produce a dataset of only "Liked" images, a `Copy Liked to Target Dir` functionality is included
+ - To produce a dataset of only "Liked" or "Disliked" images, a `Copy [Rating] to Target Dir` functionality is included
  - When copying liked images, automatically copy metadata (.txt) files with matching names
  - Automatically display associated metadata in text area if found
- - Optionally specify `filter: square images only`
+ - Filtering modes: `all`, `portrait`, `landscape`, `square`
 
 ## Demo
 
-Creating ratings file:
-![demo-img-1](https://github.com/james-things/local-rlhf-viewer/assets/71165873/f985fd5d-5a2e-426b-8125-203c190e2805)
-
 Rating images:
-![demo-img-2](https://github.com/james-things/local-rlhf-viewer/assets/71165873/c6d8750b-d959-4180-b9be-c04d75d1f8fd)
+![demo-img-2](https://github.com/james-things/image-dataset-scorer/assets/71165873/999b815c-0124-40ee-8d7d-2978096be83e)
 
 Save rating data:
 ![rating-data](https://github.com/james-things/local-rlhf-viewer/assets/71165873/fce74746-7495-48dd-9ba8-7009a43351f6)
