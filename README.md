@@ -11,10 +11,11 @@ The script currently implements the following features and can be easily extende
  - Select a target folder and search it and its subfolders recursively for images
  - Filter out previously rated images and enqueue yet-to-be-rated images for evaluation
  - Run through queued images quickly using `Like`, `Dislike`, `Skip`, and `Back` buttons
+ - Automatically display contents of associated `imgfilename.txt` metadata file if found, when viewing images
  - Ratings are stored in real-time, allowing for completion of rating work in convenient chunks
  - Images re-rated after traversing backwards in a session have their ratings data updated appropriately
  - To produce a dataset of only "Liked" or "Disliked" images, a `Copy [Rating] to Target Dir` functionality is included
- - When copying liked images, automatically copy metadata (.txt) files with matching names
+ - When copying rated images, automatically copy metadata (.txt) files with matching names
  - Automatically display associated metadata in text area if found
  - Filtering modes: `all`, `portrait`, `landscape`, `square`
 
