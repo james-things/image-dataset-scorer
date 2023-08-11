@@ -5,18 +5,29 @@ import json
 import shutil
 from PIL import Image, ImageTk
 
-# Utility function to get image files, filtering already rated images
-def find_images(directory, ratings, filter_square=False):
+# Utility function to get image files, skipping already rated images 
+# and applying the selected filtering
+def find_images(directory, ratings, filter_mode):
     images = []
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.lower().endswith(('.png', '.jpg', '.jpeg')):
                 image_path = os.path.join(root, file).replace('\\', '/')
                 if image_path not in ratings:
-                    if filter_square:
+                    if filter_mode == "square":
                         # Open the image and check if it is square
                         with Image.open(image_path) as img:
                             if img.width == img.height:
+                                images.append(image_path)
+                    if filter_mode == "portrait":
+                        # Open the image and check if it is portrait orientation
+                        with Image.open(image_path) as img:
+                            if img.width < img.height:
+                                images.append(image_path)
+                    if filter_mode == "landscape":
+                        # Open the image and check if it is landscape orientation
+                        with Image.open(image_path) as img:
+                            if img.width > img.height:
                                 images.append(image_path)
                     else:
                         images.append(image_path)
@@ -46,10 +57,32 @@ class ImageBrowser:
         self.image_label = tk.Label(self.image_frame, bg='white')
         self.image_label.pack(fill='both', expand=False)
 
-        # Filter checkbox for square images
-        self.filter_square_var = tk.IntVar()
-        self.filter_square_cb = tk.Checkbutton(self.buttons_frame, text="filter: square images only", variable=self.filter_square_var, command=self.update_image_list, bg='white')
-        self.filter_square_cb.pack(side='bottom', padx=5, pady=5)
+        # Set up radio buttons for filtering modes
+        self.filter_mode = tk.StringVar(value="all")
+
+        # Create a frame to hold the radio buttons and label
+        self.filter_frame = tk.Frame(self.buttons_frame, bg='white')
+        self.filter_frame.pack(side='bottom', padx=5, pady=5)
+
+        # Label for the filter mode
+        filter_label = tk.Label(self.filter_frame, text="Filter Mode:", bg='white')
+        filter_label.grid(row=0, column=0, columnspan=2)  # Spanning 4 columns to center the label
+
+        # Radio button for "All"
+        self.filter_all_rb = tk.Radiobutton(self.filter_frame, text="All", variable=self.filter_mode, value="all", command=self.update_image_list, bg='white')
+        self.filter_all_rb.grid(row=1, column=0, padx=5, pady=5)
+
+        # Radio button for "Landscape"
+        self.filter_landscape_rb = tk.Radiobutton(self.filter_frame, text="Landscape", variable=self.filter_mode, value="landscape", command=self.update_image_list, bg='white')
+        self.filter_landscape_rb.grid(row=1, column=1, padx=5, pady=5)
+
+        # Radio button for "Portrait"
+        self.filter_portrait_rb = tk.Radiobutton(self.filter_frame, text="Portrait", variable=self.filter_mode, value="portrait", command=self.update_image_list, bg='white')
+        self.filter_portrait_rb.grid(row=2, column=0, padx=5, pady=5)
+
+        # Radio button for "Square"
+        self.filter_square_rb = tk.Radiobutton(self.filter_frame, text="Square", variable=self.filter_mode, value="square", command=self.update_image_list, bg='white')
+        self.filter_square_rb.grid(row=2, column=1, padx=5, pady=5)
 
         # Buttons
         self.create_button(self.buttons_frame, "Like (↑)", self.like, "#90EE90")
@@ -57,6 +90,7 @@ class ImageBrowser:
         self.create_button(self.buttons_frame, "Skip (→)", self.next_image, "#FFDEAD")
         self.create_button(self.buttons_frame, "Back (←)", self.prev_image, "#DEADFF")
         self.create_button(self.buttons_frame, "Copy Liked", self.copy_liked, "#87CEFA")
+        self.create_button(self.buttons_frame, "Copy Disliked", self.copy_disliked, "#DD7F7F")
         self.create_button(self.buttons_frame, "Load Dataset", self.load_directory, "#D3D3D3")
 
         # Directory display
@@ -90,7 +124,7 @@ class ImageBrowser:
             return
 
         load_or_create = tk.messagebox.askyesno("Ratings File", 
-                                                "Would you like to load an existing ratings file?\n"
+                                                "Would you like to load an existing ratings file?\n\n"
                                                 "Select 'No' to create a new ratings file.")
         if load_or_create:
             # User wants to load an existing file
@@ -115,7 +149,7 @@ class ImageBrowser:
 
         self.directory_display.delete(0, tk.END)
         self.directory_display.insert(0, self.directory)
-        self.images = find_images(self.directory, self.ratings, filter_square=bool(self.filter_square_var.get()))
+        self.images = find_images(self.directory, self.ratings, filter_mode=self.filter_mode)
 
         self.current_image_index = -1 if self.images else None
         self.next_image()  # Display the first image
@@ -126,7 +160,7 @@ class ImageBrowser:
             with open(ratings_file, 'r') as file:
                 self.ratings = json.load(file)
         except Exception:
-            pass  # discard any exception
+            pass  # discard any exception for now
 
     # Save ratings to the defined ratings file
     def save_ratings(self, ratings_file):
@@ -135,12 +169,11 @@ class ImageBrowser:
 
     # Update the list of queued images, respecting filter state
     def update_image_list(self):
-        filter_square = bool(self.filter_square_var.get())
-        self.images = find_images(self.directory, self.ratings, filter_square)
+        filter_mode = self.filter_mode.get()
+        self.images = find_images(self.directory, self.ratings, filter_mode)
         self.current_image_index = -1 if self.images else None
         self.prev_image_index = None
         self.next_image()  # Refresh the first image
-
 
     # Resize an image to fit within the display area
     def resize_image(self, img_path):
@@ -243,13 +276,21 @@ class ImageBrowser:
         self.rate_image('dislike')
         self.next_image()
 
-    # Copy all positively rated images and associated metadata to target directory
+    # Call the copy_rated function with the 'like' param for tk gui
     def copy_liked(self):
+        self.copy_rated('like')
+
+    # Call the copy_rated function with the 'dislike' param for tk gui
+    def copy_disliked(self):
+        self.copy_rated('dislike')
+
+    # Copy all rated images of chosen rating and associated metadata to target directory
+    def copy_rated(self, target_rating):
         copy_to_dir = filedialog.askdirectory().replace('\\', '/')
         if not copy_to_dir:
             return
         for path, rating in self.ratings.items():
-            if rating == 'like':
+            if rating == target_rating:
                 # Copy the image
                 shutil.copy(path, copy_to_dir)
 
