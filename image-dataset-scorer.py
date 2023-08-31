@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 # Utility function to get image files, skipping already rated images 
 # and applying the selected filtering
 def find_images(directory, ratings, filter_mode):
+    print(f'finding images with filtering mode: {filter_mode}')
     images = []
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -15,6 +16,7 @@ def find_images(directory, ratings, filter_mode):
                 image_path = os.path.join(root, file).replace('\\', '/')
                 if image_path not in ratings:
                     if filter_mode == "square":
+                        # print("find images square reached")
                         # Open the image and check if it is square
                         with Image.open(image_path) as img:
                             if img.width == img.height:
@@ -29,8 +31,10 @@ def find_images(directory, ratings, filter_mode):
                         with Image.open(image_path) as img:
                             if img.width > img.height:
                                 images.append(image_path)
-                    else:
+                    if filter_mode == "all":
                         images.append(image_path)
+                    else:
+                        print("This should not be reachable! Something went wrong!")
     return images
 
 
@@ -149,7 +153,7 @@ class ImageBrowser:
 
         self.directory_display.delete(0, tk.END)
         self.directory_display.insert(0, self.directory)
-        self.images = find_images(self.directory, self.ratings, filter_mode=self.filter_mode)
+        self.images = find_images(self.directory, self.ratings, self.filter_mode.get())
 
         self.current_image_index = -1 if self.images else None
         self.next_image()  # Display the first image
@@ -170,6 +174,7 @@ class ImageBrowser:
     # Update the list of queued images, respecting filter state
     def update_image_list(self):
         filter_mode = self.filter_mode.get()
+        print(filter_mode)
         self.images = find_images(self.directory, self.ratings, filter_mode)
         self.current_image_index = -1 if self.images else None
         self.prev_image_index = None
